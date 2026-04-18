@@ -105,6 +105,23 @@ jobs:
       - name: Create kind cluster
         uses: helm/kind-action@v1.9.0
 
+      - name: Install cert-manager CRDs
+        run: |
+          kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.crds.yaml
+
+      - name: Wait for cert-manager CRDs to be ready
+        run: kubectl wait --for=condition=established --timeout=60s crd/certificates.cert-manager.io
+
+      - name: Install cert-manager (for Issuer support)
+        run: |
+          helm repo add jetstack https://charts.jetstack.io
+          helm repo update
+          helm install cert-manager jetstack/cert-manager \
+            --namespace cert-manager \
+            --create-namespace \
+            --set installCRDs=true \
+            --wait
+
       - name: Run chart-testing (install)
         # This step catches the bad image tags!
-        run: ct install --target-branch ${{ github.event.repository.default_branch }}        
+        run: ct install --target-branch ${{ github.event.repository.default_branch }}
