@@ -1,0 +1,60 @@
+# Webhook deployment configuration
+webhook:
+  enabled: false
+
+# Monitor deployment configuration
+monitor:
+  enabled: true
+  replicas: 1
+  image:
+    registry: docker.io
+    repository: morpheusph/hami-dra-monitor
+    tag: "latest"
+
+certs:
+  certManager:
+    enabled: false
+
+# DRA Drivers configuration
+drivers:
+  nvidia:
+    enabled: true
+    daemonSet:
+      nodeSelector:
+        gpu: null
+        nvidia.com/gpu.present: "true"
+      tolerations: []
+      affinity: {}
+
+    # If you are using gpu driver on host, you need to set this to false
+    containerDriver: false
+    image:
+      registry: docker.io
+      repository: morpheusph/k8s-dra-driver
+      tag: "v0.1.0"
+      ## Specify a imagePullPolicy
+      ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+      ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+      ##
+      pullPolicy: IfNotPresent
+      ## Optionally specify an array of imagePullSecrets.
+      ## Secrets must be manually created in the namespace.
+      ## Example:
+      ## pullSecrets:
+      ##   - myRegistryKeySecretName
+      ##
+      pullSecrets: []
+    deviceConfig:
+      # Set to true to create the ConfigMap and mount it into the plugin container.
+      enabled: true
+      # Global fallback GPU memory in MiB for nodes where NVML GetMemoryInfo returns
+      # ERROR_NOT_SUPPORTED (e.g. unified memory GPUs like NVIDIA GB10/DGX Spark).
+      # 0 = disabled (default). Per-node entries in nodeConfig take priority.
+      preConfiguredDeviceMemoryMB: 98304
+      # Per-node overrides. Each entry must have a 'name' matching the Kubernetes
+      # node name and a 'preConfiguredDeviceMemoryMB' value.
+      # Example:
+      #   nodeConfig:
+      #     - name: dgx-spark-node-1
+      #       preConfiguredDeviceMemoryMB: 98304   # 96 GiB for GB10
+      nodeConfig: []
