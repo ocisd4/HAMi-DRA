@@ -1,0 +1,17 @@
+{{- if and .Values.drivers.nvidia.enabled .Values.drivers.nvidia.deviceConfig.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hami-dra-driver-device-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/instance: hami-dra-driver
+    app.kubernetes.io/name: hami-dra-driver
+data:
+  device-config.json: |
+    {
+      "preConfiguredDeviceMemoryMB": {{ .Values.drivers.nvidia.deviceConfig.preConfiguredDeviceMemoryMB | default 0 }},
+      "nodeConfig": {{ .Values.drivers.nvidia.deviceConfig.nodeConfig | toJson }}
+    }
+{{- end }}

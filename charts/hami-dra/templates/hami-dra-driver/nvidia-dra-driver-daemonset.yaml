@@ -93,6 +93,10 @@ spec:
           value: /var/lib/kubelet/plugins
         - name: IMAGE_NAME
           value: {{ include "hami.dra.driver.nvidia.image" . }}
+        {{- if .Values.drivers.nvidia.deviceConfig.enabled }}
+        - name: DEVICE_CONFIG_FILE
+          value: /config/device-config.json
+        {{- end }}
         lifecycle:
           postStart:
             exec:
@@ -120,6 +124,11 @@ spec:
           name: host-vgpu
         - mountPath: /tmp
           name: host-tmp
+        {{- if .Values.drivers.nvidia.deviceConfig.enabled }}
+        - mountPath: /config
+          name: device-config
+          readOnly: true
+        {{- end }}
       dnsPolicy: ClusterFirst
       serviceAccount: hami-dra-driver-service-account
       serviceAccountName: hami-dra-driver-service-account
@@ -156,4 +165,9 @@ spec:
           path: /tmp
           type: ""
         name: host-tmp
+      {{- if .Values.drivers.nvidia.deviceConfig.enabled }}
+      - name: device-config
+        configMap:
+          name: hami-dra-driver-device-config
+      {{- end }}
 {{- end }}

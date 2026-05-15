@@ -44,6 +44,7 @@ kunlunResourceVMemoryName: "kunlunxin.com/vxpu-memory"
 
 # Webhook deployment configuration
 webhook:
+  enabled: true
   image:
     registry: ghcr.io
     repository: project-hami/hami-dra-webhook
@@ -185,6 +186,21 @@ drivers:
       ##   - myRegistryKeySecretName
       ##
       pullSecrets: []
+    deviceConfig:
+      # Set to true to create the ConfigMap and mount it into the plugin container.
+      enabled: false
+      # Global fallback GPU memory in MiB for nodes where NVML GetMemoryInfo returns
+      # ERROR_NOT_SUPPORTED (e.g. unified memory GPUs like NVIDIA GB10/DGX Spark).
+      # 0 = disabled (default). Per-node entries in nodeConfig take priority.
+      preConfiguredDeviceMemoryMB: 0
+      # Per-node overrides. Each entry must have a 'name' matching the Kubernetes
+      # node name and a 'preConfiguredDeviceMemoryMB' value.
+      # Example:
+      #   nodeConfig:
+      #     - name: dgx-spark-node-1
+      #       preConfiguredDeviceMemoryMB: 98304   # 96 GiB for GB10
+      nodeConfig: []
+
   fake:
     enabled: false
     deviceClassName: fake-gpu.project-hami.io

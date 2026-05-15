@@ -1,4 +1,4 @@
-{{- if .Values.webhook.config.validating.enabled }}
+{{- if and .Values.webhook.enabled .Values.webhook.config.validating.enabled }}
 {{- $excludedNamespaces := .Values.webhook.config.scope.excludedNamespaces | default (list) }}
 {{- if .Values.webhook.config.scope.excludeReleaseNamespace }}
 {{- $excludedNamespaces = concat $excludedNamespaces (list .Release.Namespace) }}

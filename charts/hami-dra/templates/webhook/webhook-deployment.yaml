@@ -1,3 +1,4 @@
+{{- if .Values.webhook.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -57,3 +58,4 @@ spec:
         - name: tls-config
           secret:
             secretName: {{ if .Values.certs.certManager.enabled }}{{ .Release.Name }}-dra-webhook-tls{{ else }}{{ .Release.Name }}-tls{{ end }}
+{{- end }}
